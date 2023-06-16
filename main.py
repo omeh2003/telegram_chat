@@ -36,19 +36,24 @@ def main(chat_export_file, summary_file, start_date, end_date, chat_type="Telegr
     filtered_messages = filter_messages_by_dates(messages, start_date, end_date)
 
     # Суммирование текста
-    text = " ".join(filtered_messages)
-    if newsletter:
-        prompt = generate_newsletter_prompt(text)
-    else:
-        prompt = generate_summary_prompt(text)
-
-    if chat_type == "Telegram":
-        summary = gpt_summarize_text(prompt)
-    else:
-        summary = nltk_summarize_text(prompt)
-
+    # filtered_messages=filtered_messages.split()
+    # text = " ".join(filtered_messages)
+    
     # Разделение текста на части с ограниченным количеством слов
-    chunks = chunk_text_by_word_count(summary, max_word_count=2500)
+    chunks = chunk_text_by_word_count(filtered_messages, max_word_count=1000)
+    for message_from_sum in chunks:
+        if newsletter:
+            prompt = generate_newsletter_prompt(message_from_sum)
+        else:
+            prompt = generate_summary_prompt(message_from_sum)
+
+        if chat_type != "Telegram":
+            summary = gpt_summarize_text(prompt)
+        else:
+            summary = nltk_summarize_text(prompt)
+        save_messages_to_file(summary, summary_file)
+
+ 
 
     # Сохранение резюме в файл
     save_messages_to_file(chunks, summary_file)
@@ -56,13 +61,13 @@ def main(chat_export_file, summary_file, start_date, end_date, chat_type="Telegr
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("chat_export_file", help="Path to the chat export file")
-    parser.add_argument("summary_file", help="Path to the summary output file")
-    parser.add_argument("start_date", help="Start date for summarization (MM/DD/YYYY)")
-    parser.add_argument("end_date", help="End date for summarization (MM/DD/YYYY)")
+    parser.add_argument("--chat_export_file", default=".\\ChatExport_2023-06-15\\result.json", help="Path to the chat export file")
+    parser.add_argument("--summary_file",default="ChatExport_2023-06-15\\summary.txt" ,help="Path to the summary output file")
+    parser.add_argument("--start_date", default="06/01/2023" , help="Start date for summarization (MM/DD/YYYY)")
+    parser.add_argument("--end_date", default="06/16/2023" , help="End date for summarization (MM/DD/YYYY)")
     parser.add_argument("--chat_type", choices=["Telegram", "Signal", "WhatsApp"], default="Telegram",
                         help="Chat type (default: Telegram)")
-    parser.add_argument("--newsletter", action="store_true", help="Generate an introduction for a newsletter")
+    parser.add_argument("--newsletter",default=True ,action="store_true", help="Generate an introduction for a newsletter")
 
     args = parser.parse_args()
 

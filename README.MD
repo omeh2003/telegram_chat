@@ -297,7 +297,7 @@ def main(chat_export_file, summary_file, start_date, end_date, chat_type="Telegr
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("chat_export_file", help="Path to the chat export file")
+    parser.add_argument("--chat_export_file", help="Path to the chat export file")
     parser.add_argument("summary_file", help="Path to the summary output file")
     parser.add_argument("start_date", help="Start date for summarization (MM/DD/YYYY)")
     parser.add_argument("end_date", help="End date for summarization (MM/DD/YYYY)")
